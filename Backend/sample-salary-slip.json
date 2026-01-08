@@ -1,0 +1,170 @@
+{
+  "scenario1_stipend": {
+    "description": "Employee with salary < 12000 (Stipend)",
+    "input": {
+      "name": "Intern John",
+      "salary": 10000,
+      "isPfApplicable": false
+    },
+    "output": {
+      "employeeName": "Intern John",
+      "grossSalary": 10000,
+      "salaryType": "STIPEND",
+      "baseSalary": 0,
+      "hra": 0,
+      "ta": 0,
+      "da": 0,
+      "pf": 0,
+      "professionalTax": 0,
+      "bonus": 0,
+      "leaveDeduction": 0,
+      "netPay": 10000,
+      "workedDays": 30,
+      "totalLeaves": 0,
+      "unpaidLeaves": 0
+    }
+  },
+  "scenario2_salary_with_pf": {
+    "description": "Employee with salary >= 12000, PF enabled, no leaves",
+    "input": {
+      "name": "Alice Smith",
+      "salary": 30000,
+      "isPfApplicable": true
+    },
+    "output": {
+      "employeeName": "Alice Smith",
+      "grossSalary": 30000,
+      "salaryType": "SALARY",
+      "baseSalary": 8920,
+      "hra": 3568,
+      "ta": 892,
+      "da": 1338,
+      "pf": 2880,
+      "professionalTax": 200,
+      "bonus": 2122,
+      "leaveDeduction": 0,
+      "netPay": 16840,
+      "workedDays": 30,
+      "totalLeaves": 0,
+      "unpaidLeaves": 0
+    },
+    "calculation_breakdown": {
+      "step1_base_salary": "30000 * 0.4 = 12000",
+      "step2_pf_deduction": "12000 - 2880 = 9120",
+      "step3_professional_tax": "9120 - 200 = 8920 (final base)",
+      "step4_hra": "8920 * 0.4 = 3568",
+      "step5_ta": "8920 * 0.1 = 892",
+      "step6_da": "8920 * 0.15 = 1338",
+      "step7_bonus": "8920 - (3568 + 892 + 1338) = 2122",
+      "step8_net_pay": "8920 + 3568 + 892 + 1338 + 2122 = 16840"
+    }
+  },
+  "scenario3_salary_without_pf": {
+    "description": "Employee with salary >= 12000, PF disabled, no leaves",
+    "input": {
+      "name": "Bob Johnson",
+      "salary": 25000,
+      "isPfApplicable": false
+    },
+    "output": {
+      "employeeName": "Bob Johnson",
+      "grossSalary": 25000,
+      "salaryType": "SALARY",
+      "baseSalary": 10000,
+      "hra": 4000,
+      "ta": 1000,
+      "da": 1500,
+      "pf": 0,
+      "professionalTax": 0,
+      "bonus": 3500,
+      "leaveDeduction": 0,
+      "netPay": 20000,
+      "workedDays": 30,
+      "totalLeaves": 0,
+      "unpaidLeaves": 0
+    },
+    "calculation_breakdown": {
+      "step1_base_salary": "25000 * 0.4 = 10000 (no PF deduction)",
+      "step2_hra": "10000 * 0.4 = 4000",
+      "step3_ta": "10000 * 0.1 = 1000",
+      "step4_da": "10000 * 0.15 = 1500",
+      "step5_bonus": "10000 - (4000 + 1000 + 1500) = 3500",
+      "step6_net_pay": "10000 + 4000 + 1000 + 1500 + 3500 = 20000"
+    }
+  },
+  "scenario4_with_unpaid_leaves": {
+    "description": "Employee with 4 total leaves (2 paid + 2 unpaid)",
+    "input": {
+      "name": "Charlie Brown",
+      "salary": 30000,
+      "isPfApplicable": true,
+      "totalLeaves": 4
+    },
+    "output": {
+      "employeeName": "Charlie Brown",
+      "grossSalary": 30000,
+      "salaryType": "SALARY",
+      "baseSalary": 8653.33,
+      "hra": 3461.33,
+      "ta": 865.33,
+      "da": 1298,
+      "pf": 2880,
+      "professionalTax": 200,
+      "bonus": 2028.67,
+      "leaveDeduction": 2000,
+      "netPay": 16306.66,
+      "workedDays": 26,
+      "totalLeaves": 4,
+      "unpaidLeaves": 2
+    },
+    "calculation_breakdown": {
+      "step1_unpaid_leaves": "4 - 2 (paid) = 2 unpaid",
+      "step2_per_day_salary": "30000 / 30 = 1000",
+      "step3_leave_deduction": "2 * 1000 = 2000",
+      "step4_salary_after_leave": "30000 - 2000 = 28000",
+      "step5_base_salary": "28000 * 0.4 = 11200",
+      "step6_pf_deduction": "11200 - 2880 = 8320",
+      "step7_professional_tax": "8320 - 200 = 8120 (final base)",
+      "step8_hra": "8120 * 0.4 = 3248",
+      "step9_ta": "8120 * 0.1 = 812",
+      "step10_da": "8120 * 0.15 = 1218",
+      "step11_bonus": "8120 - (3248 + 812 + 1218) = 1842",
+      "step12_net_pay": "8120 + 3248 + 812 + 1218 + 1842 = 15240"
+    }
+  },
+  "scenario5_high_salary_with_pf": {
+    "description": "High salary employee with PF",
+    "input": {
+      "name": "Senior Dev",
+      "salary": 100000,
+      "isPfApplicable": true
+    },
+    "output": {
+      "employeeName": "Senior Dev",
+      "grossSalary": 100000,
+      "salaryType": "SALARY",
+      "baseSalary": 36920,
+      "hra": 14768,
+      "ta": 3692,
+      "da": 5538,
+      "pf": 2880,
+      "professionalTax": 200,
+      "bonus": 12922,
+      "leaveDeduction": 0,
+      "netPay": 73840,
+      "workedDays": 30,
+      "totalLeaves": 0,
+      "unpaidLeaves": 0
+    },
+    "calculation_breakdown": {
+      "step1_base_salary": "100000 * 0.4 = 40000",
+      "step2_pf_deduction": "40000 - 2880 = 37120",
+      "step3_professional_tax": "37120 - 200 = 36920 (final base)",
+      "step4_hra": "36920 * 0.4 = 14768",
+      "step5_ta": "36920 * 0.1 = 3692",
+      "step6_da": "36920 * 0.15 = 5538",
+      "step7_bonus": "36920 - (14768 + 3692 + 5538) = 12922",
+      "step8_net_pay": "36920 + 14768 + 3692 + 5538 + 12922 = 73840"
+    }
+  }
+}

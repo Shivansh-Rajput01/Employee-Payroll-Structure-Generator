@@ -1,0 +1,291 @@
+{
+  "info": {
+    "name": "Payroll System APIs",
+    "description": "Complete API collection for Employee Payroll System with Dataset Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Get All Employees",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employees"]
+        },
+        "description": "Returns list of all employees with id and name for dropdown selection"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get Available Datasets",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/datasets",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["datasets"]
+        },
+        "description": "Returns list of all available datasets for dropdown selection"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Create Employee - High Salary (>30K)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Senior Manager\",\n  \"salary\": 50000,\n  \"isPfEnabled\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/employee",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee"]
+        },
+        "description": "Test case for salary > 30000. Expected: No PF deduction, PT = 200"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Create Employee - Mid Salary with PF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Mid Level Employee\",\n  \"salary\": 25000,\n  \"isPfEnabled\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/employee",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee"]
+        },
+        "description": "Test case for salary 12000-30000 with PF. Expected: PF = 2880, PT = 200"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Create Employee - Mid Salary without PF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Mid Level No PF\",\n  \"salary\": 20000,\n  \"isPfEnabled\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/employee",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee"]
+        },
+        "description": "Test case for salary 12000-30000 without PF. Expected: PF = 0, PT = 200"
+      },
+      "response": []
+    },
+    {
+      "name": "6. Create Employee - Low Salary with PF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Junior Employee\",\n  \"salary\": 10000,\n  \"isPfEnabled\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/employee",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee"]
+        },
+        "description": "Test case for salary <= 12000 with PF. Expected: PF = 2400, no other deductions"
+      },
+      "response": []
+    },
+    {
+      "name": "7. Create Employee - Low Salary without PF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Intern\",\n  \"salary\": 8000,\n  \"isPfEnabled\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/employee",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee"]
+        },
+        "description": "Test case for salary <= 12000 without PF. Expected: No deductions, Net Pay = Salary"
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get Employee Salary Structure (ID: 1)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/employee/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["employee", "1"]
+        },
+        "description": "Get salary structure for employee with ID 1. Change the ID as needed."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Calculate Salary - Dataset 1 (Full Day)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 1,\n  \"date\": \"2026-01-06\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/calculate-salary",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["calculate-salary"]
+        },
+        "description": "Calculate salary for employee using Dataset 1 (8.2 hours worked)"
+      },
+      "response": []
+    },
+    {
+      "name": "10. Calculate Salary - Dataset 2 (Full Day)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 2,\n  \"date\": \"2026-01-06\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/calculate-salary",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["calculate-salary"]
+        },
+        "description": "Calculate salary for employee using Dataset 2 (8 hours worked)"
+      },
+      "response": []
+    },
+    {
+      "name": "11. Calculate Salary - Dataset 3 (Full Day)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 3,\n  \"date\": \"2026-01-06\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/calculate-salary",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["calculate-salary"]
+        },
+        "description": "Calculate salary for employee using Dataset 3 (8 hours with random breaks)"
+      },
+      "response": []
+    },
+    {
+      "name": "12. Calculate Salary - Dataset 4 (Half Day)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 4,\n  \"date\": \"2026-01-06\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/calculate-salary",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["calculate-salary"]
+        },
+        "description": "Calculate salary for employee using Dataset 4 (5.75 hours - half day with deduction)"
+      },
+      "response": []
+    }
+  ]
+}
