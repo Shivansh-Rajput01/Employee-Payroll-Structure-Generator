@@ -184,7 +184,7 @@
       "response": []
     },
     {
-      "name": "9. Calculate Salary - Dataset 1 (Full Day)",
+      "name": "9. Calculate Salary - Dataset 1 (Full Month)",
       "request": {
         "method": "POST",
         "header": [
@@ -196,7 +196,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 1,\n  \"date\": \"2026-01-06\"\n}"
+          "raw": "{\n  \"employeeName\": \"Mid Level Employee\",\n  \"datasetId\": 1\n}"
         },
         "url": {
           "raw": "http://localhost:3000/calculate-salary",
@@ -205,12 +205,12 @@
           "port": "3000",
           "path": ["calculate-salary"]
         },
-        "description": "Calculate salary for employee using Dataset 1 (8.2 hours worked)"
+        "description": "Generate 1 month time logs for employee using Dataset 1 and calculate salary"
       },
       "response": []
     },
     {
-      "name": "10. Calculate Salary - Dataset 2 (Full Day)",
+      "name": "10. Calculate Salary - Dataset 2 (Full Month)",
       "request": {
         "method": "POST",
         "header": [
@@ -222,7 +222,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 2,\n  \"date\": \"2026-01-06\"\n}"
+          "raw": "{\n  \"employeeName\": \"Mid Level Employee\",\n  \"datasetId\": 2\n}"
         },
         "url": {
           "raw": "http://localhost:3000/calculate-salary",
@@ -231,12 +231,12 @@
           "port": "3000",
           "path": ["calculate-salary"]
         },
-        "description": "Calculate salary for employee using Dataset 2 (8 hours worked)"
+        "description": "Generate 1 month time logs for employee using Dataset 2 and calculate salary"
       },
       "response": []
     },
     {
-      "name": "11. Calculate Salary - Dataset 3 (Full Day)",
+      "name": "11. Calculate Salary - Dataset 4 (Half Day Pattern)",
       "request": {
         "method": "POST",
         "header": [
@@ -248,7 +248,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 3,\n  \"date\": \"2026-01-06\"\n}"
+          "raw": "{\n  \"employeeName\": \"Mid Level Employee\",\n  \"datasetId\": 4\n}"
         },
         "url": {
           "raw": "http://localhost:3000/calculate-salary",
@@ -257,33 +257,7 @@
           "port": "3000",
           "path": ["calculate-salary"]
         },
-        "description": "Calculate salary for employee using Dataset 3 (8 hours with random breaks)"
-      },
-      "response": []
-    },
-    {
-      "name": "12. Calculate Salary - Dataset 4 (Half Day)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"employeeId\": 1,\n  \"datasetId\": 4,\n  \"date\": \"2026-01-06\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:3000/calculate-salary",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["calculate-salary"]
-        },
-        "description": "Calculate salary for employee using Dataset 4 (5.75 hours - half day with deduction)"
+        "description": "Generate 1 month time logs for employee using Dataset 4 (half day pattern with salary deduction)"
       },
       "response": []
     }
