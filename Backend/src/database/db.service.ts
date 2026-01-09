@@ -6,42 +6,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
 
   async onModuleInit() {
-    try {
-      // Railway provides DATABASE_URL, use it if available
-      if (process.env.DATABASE_URL) {
-        console.log('Connecting to database using DATABASE_URL...');
-        this.pool = new Pool({
-          connectionString: process.env.DATABASE_URL,
-          max: 20,
-          idleTimeoutMillis: 30000,
-          connectionTimeoutMillis: 10000,
-          ssl: {
-            rejectUnauthorized: false, // Required for Railway PostgreSQL
-          },
-        });
-      } else {
-        // Fallback to individual env variables for local development
-        console.log('Connecting to database using individual env variables...');
-        this.pool = new Pool({
-          host: process.env.DB_HOST || 'localhost',
-          port: parseInt(process.env.DB_PORT || '5432'),
-          database: process.env.DB_NAME || 'payroll_db',
-          user: process.env.DB_USER || 'postgres',
-          password: process.env.DB_PASSWORD || 'postgres',
-          max: 20,
-          idleTimeoutMillis: 30000,
-          connectionTimeoutMillis: 10000,
-        });
-      }
-
-      // Test the connection
-      const client = await this.pool.connect();
-      console.log('Database connection successful!');
-      client.release();
-    } catch (error) {
-      console.error('Database connection failed:', error.message);
-      throw error;
-    }
+    this.pool =  new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      database: process.env.DB_NAME || 'payroll_db',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
   }
 
   async onModuleDestroy() {

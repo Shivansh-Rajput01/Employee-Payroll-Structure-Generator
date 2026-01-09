@@ -24,10 +24,20 @@ export interface SalaryBreakdown {
 /**
  * Calculate salary structure based on salary amount and PF status
  * 
+ * New Calculation Logic:
+ * 1. Base Salary = 40% of total salary
+ * 2. HRA = 40% of base salary
+ * 3. TA = 10% of base salary
+ * 4. DA = 15% of base salary
+ * 5. Bonus = Salary - (Base + HRA + TA + DA)
+ * 6. PF = 24% of base salary (capped at ₹2,880) - only if enabled and salary <= 30000
+ * 7. PT = ₹200 (fixed) - only if salary >= 12000
+ * 8. Net Pay = (Base + HRA + TA + DA + Bonus) - (PF + PT)
+ * 
  * Rules:
- * 1. Salary > 30000: No PF, PT deducted first
- * 2. Salary 12000-30000: PF + PT deducted first, then structure calculated
- * 3. Salary <= 12000: Only PF (if enabled), no PT, no structure
+ * 1. Salary > 30000: No PF, PT applicable
+ * 2. Salary 12000-30000: PF (if enabled) + PT applicable
+ * 3. Salary < 12000: Only PF (if enabled), no PT, no structure breakdown
  */
 export function calculateSalaryStructure(
   employeeName: string,
@@ -43,37 +53,31 @@ export function calculateSalaryStructure(
   let bonus = 0;
   let netPay = salary;
 
-  if (salary > 30000) {
-    // High salary: No PF, PT deducted first
-    pt = PT_AMOUNT;
-    const remaining = salary - pt;
-    
-    baseSalary = remaining * BASE_PERCENTAGE;
+  if (salary >= 12000) {
+    // Calculate salary structure for salary >= 12000
+    baseSalary = salary * BASE_PERCENTAGE;
     hra = baseSalary * HRA_PERCENTAGE;
     ta = baseSalary * TA_PERCENTAGE;
     da = baseSalary * DA_PERCENTAGE;
-    bonus = remaining - (baseSalary + hra + ta + da);
-    netPay = remaining;
-  } 
-  else if (salary >= 12000) {
-    // Mid salary: PF + PT deducted first
-    if (isPfEnabled) {
-      pf = Math.min(salary * PF_PERCENTAGE, MAX_PF);
+    bonus = salary - (baseSalary + hra + ta + da);
+
+    // PF calculation: 24% of base salary (only if enabled and salary <= 30000)
+    if (isPfEnabled && salary <= 30000) {
+      pf = Math.min(baseSalary * PF_PERCENTAGE, MAX_PF);
     }
+
+    // PT: ₹200 for all salaries >= 12000
     pt = PT_AMOUNT;
-    
-    const remaining = salary - pf - pt;
-    baseSalary = remaining * BASE_PERCENTAGE;
-    hra = baseSalary * HRA_PERCENTAGE;
-    ta = baseSalary * TA_PERCENTAGE;
-    da = baseSalary * DA_PERCENTAGE;
-    bonus = remaining - (baseSalary + hra + ta + da);
-    netPay = remaining;
+
+    // Net Pay = Gross - Deductions
+    const grossPay = baseSalary + hra + ta + da + bonus;
+    netPay = grossPay - pf - pt;
   } 
   else {
-    // Low salary: Only PF (if enabled)
+    // Low salary (< 12000): Only PF (if enabled), no structure breakdown
     if (isPfEnabled) {
-      pf = Math.min(salary * PF_PERCENTAGE, MAX_PF);
+      baseSalary = salary * BASE_PERCENTAGE;
+      pf = Math.min(baseSalary * PF_PERCENTAGE, MAX_PF);
       netPay = salary - pf;
     }
   }
