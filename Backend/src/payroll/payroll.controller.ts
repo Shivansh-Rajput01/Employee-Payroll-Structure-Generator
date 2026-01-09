@@ -30,7 +30,7 @@ export class PayrollController {
 
   // API 3: Get available datasets (for dropdown)
   @Get('datasets')
-  async getAvailableDatasets() {
+  getAvailableDatasets() {
     return this.payrollService.getAvailableDatasets();
   }
 

@@ -15,6 +15,29 @@ export interface Dataset {
   hoursPerDay: number;
 }
 
+export interface AttendanceData {
+  totalHoursWorked: number;
+  attendedDays: number;
+  fullDays: number;
+  halfDays: number;
+  absentDays: number;
+  paidLeaves: number;
+  unpaidLeaves: number;
+  averageHoursPerDay: number;
+}
+
+export interface TimeSession {
+  start: string;
+  end: string;
+}
+
+export interface Employee {
+  id: number;
+  name: string;
+  salary: string;
+  is_pf_applicable: boolean;
+}
+
 @Injectable()
 export class PayrollService {
   constructor(private db: DatabaseService) {}
@@ -32,22 +55,22 @@ export class PayrollService {
       [name, salary, isPfEnabled],
     );
 
-    const employee = result.rows[0];
+    const employee = result.rows[0] as Employee;
     const salaryStructure = calculateSalaryStructure(name, salary, isPfEnabled);
 
     return { id: employee.id, ...salaryStructure };
   }
 
   // API 2: Get all employees for dropdown
-  async getAllEmployees() {
+  async getAllEmployees(): Promise<Array<{ id: number; name: string }>> {
     const result = await this.db.query(
       'SELECT id, name FROM employee ORDER BY name',
     );
-    return result.rows;
+    return result.rows as Array<{ id: number; name: string }>;
   }
 
   // API 3: Get available datasets for dropdown
-  async getAvailableDatasets(): Promise<Dataset[]> {
+  getAvailableDatasets(): Dataset[] {
     return [
       {
         id: 1,
@@ -81,10 +104,13 @@ export class PayrollService {
     await this.ensureTablesExist();
 
     const employee = await this.getEmployee(employeeId);
-    const dataset = await this.getDataset(datasetId);
+    const dataset = this.getDataset(datasetId);
 
     await this.clearTimeLogs(employeeId);
-    const timeLogsInserted = await this.generateMonthlyTimeLogs(employeeId, datasetId);
+    const timeLogsInserted = await this.generateMonthlyTimeLogs(
+      employeeId,
+      datasetId,
+    );
 
     const attendance = await this.calculateAttendance(employeeId);
     const salaryCalc = this.calculateSalaryWithAttendance(
@@ -145,7 +171,7 @@ export class PayrollService {
 
   // Private helper methods
 
-  private async getEmployee(employeeId: number) {
+  private async getEmployee(employeeId: number): Promise<Employee> {
     const result = await this.db.query(
       'SELECT id, name, salary, is_pf_applicable FROM employee WHERE id = $1',
       [employeeId],
@@ -155,11 +181,11 @@ export class PayrollService {
       throw new Error(`Employee with ID ${employeeId} not found`);
     }
 
-    return result.rows[0];
+    return result.rows[0] as Employee;
   }
 
-  private async getDataset(datasetId: number): Promise<Dataset> {
-    const datasets = await this.getAvailableDatasets();
+  private getDataset(datasetId: number): Dataset {
+    const datasets = this.getAvailableDatasets();
     const dataset = datasets.find((d) => d.id === datasetId);
 
     if (!dataset) {
@@ -178,31 +204,35 @@ export class PayrollService {
   private async ensureTablesExist() {
     try {
       await this.db.query(`
-        CREATE TABLE IF NOT EXISTS employee (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          salary DECIMAL(10, 2) NOT NULL,
-          is_pf_applicable BOOLEAN NOT NULL DEFAULT false
-        )
-      `);
+      CREATE TABLE IF NOT EXISTS employee (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        salary DECIMAL(10, 2) NOT NULL,
+        is_pf_applicable BOOLEAN NOT NULL DEFAULT false
+      )
+    `);
 
       await this.db.query(`DROP TABLE IF EXISTS time_log CASCADE`);
 
       await this.db.query(`
-        CREATE TABLE time_log (
-          id SERIAL PRIMARY KEY,
-          employee_id INTEGER NOT NULL,
-          punch_in_time TIMESTAMP NOT NULL,
-          punch_out_time TIMESTAMP NOT NULL,
-          FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE
-        )
-      `);
+      CREATE TABLE time_log (
+        id SERIAL PRIMARY KEY,
+        employee_id INTEGER NOT NULL,
+        punch_in_time TIMESTAMP NOT NULL,
+        punch_out_time TIMESTAMP NOT NULL,
+        FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE
+      )
+    `);
 
       await this.db.query(`
-        CREATE INDEX IF NOT EXISTS idx_time_log_employee ON time_log(employee_id)
-      `);
+      CREATE INDEX IF NOT EXISTS idx_time_log_employee ON time_log(employee_id)
+    `);
     } catch (error) {
-      console.error('Error creating tables:', error.message);
+      if (error instanceof Error) {
+        console.error('Error creating tables:', error.message);
+      } else {
+        console.error('Error creating tables:', error);
+      }
     }
   }
 
@@ -219,8 +249,13 @@ export class PayrollService {
       for (const session of pattern) {
         await this.db.query(
           'INSERT INTO time_log (employee_id, punch_in_time, punch_out_time) VALUES ($1, $2, $3)',
-          [employeeId, `${dateStr} ${session.start}`, `${dateStr} ${session.end}`],
+          [
+            employeeId,
+            `${dateStr} ${session.start}`,
+            `${dateStr} ${session.end}`,
+          ],
         );
+
         totalInserted++;
       }
     }
@@ -228,8 +263,8 @@ export class PayrollService {
     return totalInserted;
   }
 
-  private getDatasetPattern(datasetId: number) {
-    const patterns = {
+  private getDatasetPattern(datasetId: number): TimeSession[] {
+    const patterns: Record<number, TimeSession[]> = {
       1: [
         { start: '10:00:00', end: '10:45:00' },
         { start: '10:48:00', end: '11:33:00' },
@@ -283,8 +318,12 @@ export class PayrollService {
     let halfDays = 0;
     let totalHoursWorked = 0;
 
-    result.rows.forEach((day) => {
-      const hours = parseFloat(day.daily_hours);
+    interface AttendanceRow {
+      daily_hours: string | number;
+    }
+
+    (result.rows as AttendanceRow[]).forEach((day) => {
+      const hours = Number(day.daily_hours);
       totalHoursWorked += hours;
 
       if (hours >= FULL_DAY_HOURS) {
@@ -310,11 +349,16 @@ export class PayrollService {
       absentDays,
       paidLeaves,
       unpaidLeaves,
-      averageHoursPerDay: parseFloat((totalHoursWorked / daysWithLogs || 0).toFixed(2)),
+      averageHoursPerDay: parseFloat(
+        (totalHoursWorked / daysWithLogs || 0).toFixed(2),
+      ),
     };
   }
 
-  private calculateSalaryWithAttendance(baseSalary: number, attendance: any) {
+  private calculateSalaryWithAttendance(
+    baseSalary: number,
+    attendance: AttendanceData,
+  ) {
     const dailySalary = baseSalary / 30;
 
     const fullDaysPay = attendance.fullDays * dailySalary;

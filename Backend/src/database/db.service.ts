@@ -5,8 +5,8 @@ import { Pool, PoolClient } from 'pg';
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
 
-  async onModuleInit() {
-    this.pool =  new Pool({
+  onModuleInit() {
+    this.pool = new Pool({
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
       database: process.env.DB_NAME || 'payroll_db',
@@ -22,7 +22,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.pool.end();
   }
 
-  async query(text: string, params?: any[]) {
+  async query(text: string, params?: unknown[]) {
     const start = Date.now();
     const result = await this.pool.query(text, params);
     const duration = Date.now() - start;

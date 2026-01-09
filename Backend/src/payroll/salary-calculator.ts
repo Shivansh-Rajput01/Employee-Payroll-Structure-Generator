@@ -2,9 +2,9 @@
 const MAX_PF = 2880;
 const PT_AMOUNT = 200;
 const PF_PERCENTAGE = 0.24;
-const BASE_PERCENTAGE = 0.40;
-const HRA_PERCENTAGE = 0.40;
-const TA_PERCENTAGE = 0.10;
+const BASE_PERCENTAGE = 0.4;
+const HRA_PERCENTAGE = 0.4;
+const TA_PERCENTAGE = 0.1;
 const DA_PERCENTAGE = 0.15;
 
 export interface SalaryBreakdown {
@@ -23,7 +23,6 @@ export interface SalaryBreakdown {
 
 /**
  * Calculate salary structure based on salary amount and PF status
- * 
  * New Calculation Logic:
  * 1. Base Salary = 40% of total salary
  * 2. HRA = 40% of base salary
@@ -33,7 +32,6 @@ export interface SalaryBreakdown {
  * 6. PF = 24% of base salary (capped at ₹2,880) - only if enabled and salary <= 30000
  * 7. PT = ₹200 (fixed) - only if salary >= 12000
  * 8. Net Pay = (Base + HRA + TA + DA + Bonus) - (PF + PT)
- * 
  * Rules:
  * 1. Salary > 30000: No PF, PT applicable
  * 2. Salary 12000-30000: PF (if enabled) + PT applicable
@@ -72,8 +70,7 @@ export function calculateSalaryStructure(
     // Net Pay = Gross - Deductions
     const grossPay = baseSalary + hra + ta + da + bonus;
     netPay = grossPay - pf - pt;
-  } 
-  else {
+  } else {
     // Low salary (< 12000): Only PF (if enabled), no structure breakdown
     if (isPfEnabled) {
       baseSalary = salary * BASE_PERCENTAGE;
